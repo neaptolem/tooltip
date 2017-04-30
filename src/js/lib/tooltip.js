@@ -2,7 +2,11 @@ var TOOLTIP = (function () {
     'use strict';
     var POSITIONS = ['top', 'left', 'right', 'bottom'];
     var EVENTS = ['click', 'dbclick', 'mouseover'];
+    var WITHOUT_END_TAG = ['INPUT', 'IMG', 'BUTTON'];
+    var TOOLTIP_CONTAINER_ID_ENDING = 'tooltip_container';
+
     var tooltip;
+    var tooltipContainer;
     var objectForTooltip;
     var property = {};
 
@@ -38,7 +42,7 @@ var TOOLTIP = (function () {
     }
 
 
-    function Tooltip(obj = {}, parent) {
+    function Tooltip(parent) {
         DOMObjectWraper.call(this, document.createElement('div'));
 
         function _idGenerator(id) {
@@ -63,9 +67,11 @@ var TOOLTIP = (function () {
 
     function ObjectForTooltip(id, obj) {
         DOMObjectWraper.call(this, document.getElementById(id));
-        var tooltip = new Tooltip(obj, this);
         var timeout;
         var self = this;
+        var tooltip = new Tooltip(this);
+
+
         var positionService = {
             'top': function () {
                 tooltip._element.style.top = '-' + self._element.clientHeight + 'px';
@@ -81,7 +87,7 @@ var TOOLTIP = (function () {
             }
         }
 
-        var _addListeners = function () {
+        function _addListeners() {
             self._element.addEventListener(property.event, function () {
                 clearTimeout(timeout);
                 tooltip.addClass(['display']);
@@ -101,17 +107,54 @@ var TOOLTIP = (function () {
             callback();
         }
 
+        function _createTooltipNode() {
+            if (!WITHOUT_END_TAG.includes(self._element.tagName)) {
+                self._element.appendChild(tooltip._element);
+                console.log(self._element.tagName);
+            } else {
+                if (!document.getElementById(self.getId + TOOLTIP_CONTAINER_ID_ENDING)) {
+                    tooltipContainer = new TooltipContainer(self.getId(), null, tooltip);
+                    self._element.parentNode.insertBefore(tooltipContainer._element, self._element);
+                    tooltipContainer._element.appendChild(self._element);
+                } else {
+                    tooltipContainer = new TooltipContainer(null, document.getElementById(self.getId + TOOLTIP_CONTAINER_ID_ENDING), tooltip);
+                }
+            }
+        }
+
         this.create = function () {
             this.addClass(['object-for-tooltip']);
             _setProperty(function () {
                 tooltip.create();
-                self._element.appendChild(tooltip._element);
+                _createTooltipNode();
                 _addListeners();
                 positionService[property.position]();
             });
 
         };
 
+    }
+
+    function TooltipContainer(id, elem, tooltip) {
+        var self = this;
+        if (id) {
+            DOMObjectWraper.call(this, document.createElement('div'));
+            _create();
+        } else {
+            DOMObjectWraper.call(this, elem);
+            _add();
+        }
+
+        function _create() {
+            self._element.id = id + TOOLTIP_CONTAINER_ID_ENDING;
+            _add();
+        }
+
+        function _add() {
+            console.log(tooltip);
+            debugger;
+            self._element.appendChild(tooltip._element);
+        }
     }
 
     var create = function (id, obj = {}) {
@@ -125,28 +168,3 @@ var TOOLTIP = (function () {
         'create': create
     };
 })();
-
-window.onload = function () {
-    (function () {
-        'use strict';
-        var tooltip1 = TOOLTIP.create('myh1', {
-            position: 'top',
-            text: 'uaua myh1_tooltip',
-            event: 'hover'
-        });
-
-        var tooltip2 = TOOLTIP.create('mydiv1', {
-            position: 'right',
-            text: 'div tooltip',
-            event: 'click'
-        });
-        var tooltip3 = TOOLTIP.create('myh1', {
-            position: 'bottom',
-            text: 'uaua ',
-            event: 'hover'
-        });
-        // var tooltip3 = TOOLTIP.create('input1');
-
-        console.log(tooltip1, tooltip2);
-    })();
-}
