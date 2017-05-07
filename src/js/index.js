@@ -12,13 +12,13 @@ window.onload = function () {
             text: 'div tooltip',
             event: 'click'
         });
-        var tooltip3 = TOOLTIP.create('myh1', {
+        var tooltip3 = new TOOLTIP('myh1', {
             position: 'bottom',
             text: 'uaua ',
-            event: 'hover'
+            event: 'hover',
+            delay: '5000'
         });
-        var tooltip4 = TOOLTIP.create('input1');
+        var tooltip4 = new TOOLTIP('input1');
 
-        console.log(tooltip1, tooltip2);
     })();
 }

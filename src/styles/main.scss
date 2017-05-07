@@ -1,3 +1,4 @@
+.tooltip-container,
 .object-for-tooltip {
     position: relative;
     &:after {
@@ -6,6 +7,10 @@
         clear: both;
     }
     .tooltip {
+        background-color: red;
+        padding: 10px 10px;
+        z-index: 1;
+        color: white;
         position: absolute;
         display: none;
         &.left {

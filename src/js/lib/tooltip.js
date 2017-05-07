@@ -1,4 +1,4 @@
-var TOOLTIP = (function () {
+function TOOLTIP(id, obj) {
     'use strict';
     var POSITIONS = ['top', 'left', 'right', 'bottom'];
     var EVENTS = ['click', 'dbclick', 'mouseover'];
@@ -8,8 +8,9 @@ var TOOLTIP = (function () {
     var tooltip;
     var tooltipContainer;
     var objectForTooltip;
-    var property = {};
+    var event, position, delay, text;
 
+    create(id, obj);
 
     function DOMObjectWraper(elem) {
         this._element = elem;
@@ -44,6 +45,7 @@ var TOOLTIP = (function () {
 
     function Tooltip(parent) {
         DOMObjectWraper.call(this, document.createElement('div'));
+        var self = this;
 
         function _idGenerator(id) {
             if (!document.getElementById(id)) {
@@ -53,31 +55,12 @@ var TOOLTIP = (function () {
             }
         }
 
-        this.create = function () {
-
-            this._element.id = _idGenerator(parent.getId() + '_tooltip');
-
-
-            this._element.appendChild(document.createTextNode(property.text));
-
-            this.addClass(['tooltip', property.position]);
-        }
-
-    }
-
-    function ObjectForTooltip(id, obj) {
-        DOMObjectWraper.call(this, document.getElementById(id));
-        var timeout;
-        var self = this;
-        var tooltip = new Tooltip(this);
-
-
         var positionService = {
             'top': function () {
-                tooltip._element.style.top = '-' + self._element.clientHeight + 'px';
+                self._element.style.top = '-' + parent._element.clientHeight + parseInt(self._element.style.paddingTop) + parseInt(self._element.style.paddingBottom) + 'px';
             },
             'bottom': function () {
-                tooltip._element.style.bottom = '-' + self._element.clientHeight + 'px';
+                self._element.style.bottom = '-' + parent._element.clientHeight + 'px';
             },
             'left': function () {
 
@@ -87,8 +70,24 @@ var TOOLTIP = (function () {
             }
         }
 
+        this.create = function () {
+            this._element.id = _idGenerator(parent.getId() + '_tooltip');
+            this._element.appendChild(document.createTextNode(text));
+            this.addClass(['tooltip']);
+            positionService[position]();
+        }
+
+    }
+
+    function ObjectForTooltip(id, obj) {
+        DOMObjectWraper.call(this, document.getElementById(id));
+        var self = this;
+        var tooltip = new Tooltip(this);
+
         function _addListeners() {
-            self._element.addEventListener(property.event, function () {
+            var timeout;
+
+            self._element.addEventListener(event, function () {
                 clearTimeout(timeout);
                 tooltip.addClass(['display']);
             });
@@ -96,21 +95,21 @@ var TOOLTIP = (function () {
             self._element.addEventListener('mouseout', function () {
                 timeout = setTimeout(function () {
                     tooltip.removeClass(['display']);
-                }, 3000);
+                }, delay);
             });
         }
 
         function _setProperty(callback) {
-            property.event = (obj.event && EVENTS.includes(obj.event)) ? obj.event : 'mouseover';
-            property.position = (obj.position && POSITIONS.includes(obj.position)) ? obj.position : 'top';
-            property.text = obj.text || 'undefined';
+            event = (obj.event && EVENTS.includes(obj.event)) ? obj.event : 'mouseover';
+            position = (obj.position && POSITIONS.includes(obj.position)) ? obj.position : 'top';
+            text = obj.text || 'undefined';
+            delay = +obj.delay || 1000;
             callback();
         }
 
-        function _createTooltipNode() {
+        function _createTooltipNode(callback) {
             if (!WITHOUT_END_TAG.includes(self._element.tagName)) {
                 self._element.appendChild(tooltip._element);
-                console.log(self._element.tagName);
             } else {
                 if (!document.getElementById(self.getId + TOOLTIP_CONTAINER_ID_ENDING)) {
                     tooltipContainer = new TooltipContainer(self.getId(), null, tooltip);
@@ -120,25 +119,26 @@ var TOOLTIP = (function () {
                     tooltipContainer = new TooltipContainer(null, document.getElementById(self.getId + TOOLTIP_CONTAINER_ID_ENDING), tooltip);
                 }
             }
+            callback();
         }
 
         this.create = function () {
             this.addClass(['object-for-tooltip']);
             _setProperty(function () {
                 tooltip.create();
-                _createTooltipNode();
-                _addListeners();
-                positionService[property.position]();
+                _createTooltipNode(function () {
+                    _addListeners();
+                });
             });
-
         };
-
     }
 
     function TooltipContainer(id, elem, tooltip) {
         var self = this;
+
         if (id) {
             DOMObjectWraper.call(this, document.createElement('div'));
+            this.addClass(['tooltip-container']);
             _create();
         } else {
             DOMObjectWraper.call(this, elem);
@@ -151,20 +151,12 @@ var TOOLTIP = (function () {
         }
 
         function _add() {
-            console.log(tooltip);
-            debugger;
             self._element.appendChild(tooltip._element);
         }
     }
 
-    var create = function (id, obj = {}) {
+    function create(id, obj = {}) {
         var objectForTooltip = new ObjectForTooltip(id, obj);
         objectForTooltip.create();
-        return this;
     }
-
-
-    return {
-        'create': create
-    };
-})();
+}
