@@ -5,12 +5,13 @@ function TOOLTIP(id, obj) {
     var WITHOUT_END_TAG = ['INPUT', 'IMG', 'BUTTON'];
     var TOOLTIP_CONTAINER_ID_ENDING = 'tooltip_container';
 
-    var tooltip;
-    var tooltipContainer;
     var objectForTooltip;
     var event, position, delay, text;
 
-    create(id, obj);
+    (function create(id, obj = {}) {
+        objectForTooltip = new ObjectForTooltip(id, obj);
+        objectForTooltip.create();
+    })(id, obj);
 
     function DOMObjectWraper(elem) {
         this._element = elem;
@@ -83,10 +84,10 @@ function TOOLTIP(id, obj) {
         DOMObjectWraper.call(this, document.getElementById(id));
         var self = this;
         var tooltip = new Tooltip(this);
+        var tooltipContainer;
+        var timeout;
 
         function _addListeners() {
-            var timeout;
-
             self._element.addEventListener(event, function () {
                 clearTimeout(timeout);
                 tooltip.addClass(['display']);
@@ -131,6 +132,15 @@ function TOOLTIP(id, obj) {
                 });
             });
         };
+
+        this.getTooltip = function () {
+            return tooltip;
+        };
+
+        this.hide = function () {
+            clearTimeout(timeout);
+            tooltip.removeClass(['display']);
+        }
     }
 
     function TooltipContainer(id, elem, tooltip) {
@@ -155,8 +165,22 @@ function TOOLTIP(id, obj) {
         }
     }
 
-    function create(id, obj = {}) {
-        var objectForTooltip = new ObjectForTooltip(id, obj);
-        objectForTooltip.create();
+    this.options = function () {
+        return {
+            'event': event,
+            'position': position,
+            'delay': delay,
+            'text': text,
+        }
+    }
+
+    this.id = function () {
+        return objectForTooltip.getTooltip()
+            ._element.id;
+    }
+
+    this.hide = function () {
+        objectForTooltip.hide();
+        return this;
     }
 }
