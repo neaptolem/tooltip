@@ -58,16 +58,19 @@ function TOOLTIP(id, obj) {
 
         var positionService = {
             'top': function () {
-                self._element.style.top = '-' + parent._element.clientHeight + parseInt(self._element.style.paddingTop) + parseInt(self._element.style.paddingBottom) + 'px';
+                self._element.style.top = 0;
             },
             'bottom': function () {
-                self._element.style.bottom = '-' + parent._element.clientHeight + 'px';
+                self._element.style.bottom = 0;
             },
             'left': function () {
-
+                console.log(self._element);
+                console.log(document.getElementById(self._element.id).clientWidth);
+                self._element.style.top = (parent._element.clientHeight / 2) + (self._element.clientHeight / 2) + 'px';
+                self._element.style.left = -self._element.clientHeight;
             },
             'right': function () {
-
+                self._element.style.right = 0;
             }
         }
 
@@ -75,7 +78,12 @@ function TOOLTIP(id, obj) {
             this._element.id = _idGenerator(parent.getId() + '_tooltip');
             this._element.appendChild(document.createTextNode(text));
             this.addClass(['tooltip']);
-            positionService[position]();
+        }
+
+        this.setPosition = function () {
+            setTimeout(function () {
+                positionService[position]()
+            });
         }
 
     }
@@ -129,6 +137,7 @@ function TOOLTIP(id, obj) {
                 tooltip.create();
                 _createTooltipNode(function () {
                     _addListeners();
+                    tooltip.setPosition();
                 });
             });
         };
@@ -182,5 +191,14 @@ function TOOLTIP(id, obj) {
     this.hide = function () {
         objectForTooltip.hide();
         return this;
+    }
+}
+
+function TOOLTIPS_COLECTION() {
+    var tooltips = [];
+    this.create = function (id, obj) {
+        var tmpObj = new TOOLTIP(id, obj);
+        tooltips.push(tmpObj);
+        return tmpObj;
     }
 }

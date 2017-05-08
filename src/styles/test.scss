@@ -1,0 +1,15 @@
+* {
+    box-sizing: border-box;
+}
+
+.test-section {
+    .test1 {
+        display: flex;
+        flex-wrap: wrap;
+        .test-item {
+            width: 25%;
+            padding: 0 20px;
+            min-width: 200px;
+        }
+    }
+}
