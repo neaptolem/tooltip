@@ -7,25 +7,65 @@
         clear: both;
     }
     .tooltip {
-        background-color: red;
+        background-color: black;
+        text-align: center;
+        border-radius: 6px;
         padding: 10px 10px;
         z-index: 1;
         color: white;
         position: absolute;
         display: none;
+        &:after {
+            content: "";
+            position: absolute;
+            border-style: solid;
+            border-color: black transparent transparent transparent;
+            border-width: 6px;
+        }
         &.left {
+            top: 50%;
             left: 0;
-            top: 0;
+            transform: translate(-100%, -50%);
+            &:after {
+                top: 50%;
+                right: 0;
+                margin-right: -11px;
+                margin-top: -6px;
+                transform: rotate(-90deg);
+            }
         }
         &.top {
             top: 0;
+            left: 50%;
+            transform: translate(-50%, -100%);
+            &:after {
+                top: 100%;
+                left: 50%;
+                margin-left: -6px;
+            }
         }
         &.right {
+            top: 50%;
             right: 0;
-            top: 0;
+            transform: translate(100%, -50%);
+            &:after {
+                top: 50%;
+                left: 0;
+                margin-left: -11px;
+                margin-top: -6px;
+                transform: rotate(90deg);
+            }
         }
         &.bottom {
             bottom: 0;
+            left: 50%;
+            transform: translate(-50%, 100%);
+            &:after {
+                bottom: 100%;
+                left: 50%;
+                margin-left: -6px;
+                transform: rotate(180deg);
+            }
         }
         &.display {
             display: block;

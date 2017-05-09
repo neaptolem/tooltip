@@ -76,32 +76,6 @@ function TOOLTIPS_COLECTION() {
                 }
             }
 
-            var positionService = {
-                'top': function () {
-                    self._element.style.top = '0%';
-                    self._element.style.left = '50%';
-                    self._element.style.transform = 'translate(-50%,-100%)';
-
-                },
-                'bottom': function () {
-                    self._element.style.bottom = 0;
-                    self._element.style.left = '50%';
-                    self._element.style.transform = 'translate(-50%,100%)';
-                },
-                'left': function () {
-                    self._element.style.top = '50%';
-                    self._element.style.left = 0;
-                    self._element.style.transform = 'translate(-100%,-50%)';
-                },
-                'right': function () {
-                    self._element.style.top = '50%';
-                    self._element.style.right = 0;
-                    self._element.style.transform = ' translate(100%,-50%)';
-                }
-            }
-
-
-
             this.create = function () {
                 this._element.id = _idGenerator(parent.getId() + '_tooltip');
                 this._element.appendChild(document.createTextNode(text));
@@ -109,9 +83,7 @@ function TOOLTIPS_COLECTION() {
             }
 
             this.setPosition = function () {
-                setTimeout(function () {
-                    positionService[position]();
-                });
+                self.addClass([position]);
             }
 
         }
@@ -147,7 +119,6 @@ function TOOLTIPS_COLECTION() {
                     }
                     tooltip.addClass(['display']);
                 });
-                console.log()
                 hideService[hideType]();
             }
 
@@ -225,6 +196,8 @@ function TOOLTIPS_COLECTION() {
                 'position': position,
                 'delay': delay,
                 'text': text,
+                'dismiss': dismiss,
+                'hideType': hideType
             }
         }
 
@@ -238,5 +211,4 @@ function TOOLTIPS_COLECTION() {
             return this;
         }
     }
-
 }
